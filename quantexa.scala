@@ -1,27 +1,28 @@
 import io.Source
 import scala.util._
 
-val symbol = "flightData.csv"
 
-//Q1
-def total_flights_month(symbol: String, year: Int) : List[(String, Int)] = {
-    val lines = Source.fromFile(symbol).getLines.toList
-    //We have the lines, we need to filter the list to acquire all the unique flightId's and their date, then count for each month the amount of different unique flights
-    
-}
+object quantexa {
+    def main(args: Array[String]) = {
 
-//Q2
-def frequent_flyers() : Void = {
-    
-}
+        val fileName = "flightData.csv"
+        val dateFormat = "yyyy-MM-dd"
+        val dtf = java.time.format.DateTimeFormatter.ofPattern(dateFormat)
 
-//Q3
-def number_countries() : Void = {
 
-}
 
-//Q4
-def flights_together() : Void = {
-    
+        //Make a list from CSV file and drop first denomination line
+        def get_all_flights(file: String) : List[String] = {
+            Source.fromFile(file).getLines.toList.drop(1)
+        }
+
+        //Q1 Find the total number of flights for each month.
+        def total_flights_month(file: String) : Map[String, Int] = {
+            get_all_flights(file).groupBy(_.split(",")(4).substring(5).dropRight(3)).mapValues(_.size)
+        }
+
+        //java.time.LocalDate.parse((_.split(",")(4)), dtf).getMonthValue
+        println(total_flights_month(fileName))
+    }
 }
 
