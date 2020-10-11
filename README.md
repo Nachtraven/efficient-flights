@@ -1,9 +1,14 @@
 # Quantexa
 Coding challenge for quantexa
 
+Total coding + Learning time: 22 hours/two full days
 
-To launch: 
-Compile with scalac quantexa.scala
-Run with scala quantexa
+### NOTES: Ran in a JVM with a default of 4gb of memory. Certainly lacks efficiency, could be bettered with spark.
 
-Output is in 3 parts, one for each q 1-2-3
+
+# To launch: 
+### Compile with scalac quantexa.scala
+
+### Run with scala quantexa
+
+Output is in 4 parts, one for each question
