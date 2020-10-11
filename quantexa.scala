@@ -168,21 +168,22 @@ object quantexa {
 
 
 
-        //Q1
+        //Q1 print output to q1 in format Month, Amount of Flights
         println(total_flights_month(get_all_csv(flightData)))
         println("---")
 
-        //Q2
-        println(associate_name_id(get_map(get_all_csv(passengers)), frequent_flyers(get_all_csv(flightData), 100)))
+        //Q2 print output to q2 in format number of flights, flyer ID, Name, Surname
+        val unformatted = associate_name_id(get_map(get_all_csv(passengers)), frequent_flyers(get_all_csv(flightData), 100))
+        println(unformatted.values)
         println("---")
 
-        //Q3
+        //Q3 print output to q3 in format flyer ID, number of hops
         println(greatest_number_countries(get_all_csv(flightData), "uk", 3))
         println("---")
 
 
-        //Q4
-        println(flights_together(get_all_csv(flightData), 3).take(100))
+        //Q4 print output to q4 in format (flyer ID, flyer ID), Number of flights together
+        println(flights_together(get_all_csv(flightData), 3))
     }
 }
 
