@@ -125,32 +125,89 @@ object quantexa {
 
 
 
+        def get_pairs_of_flight(flightList: List[String]): List[Seq[Int]] = { //Map[(Int, Int) -> Int] , currentIndex: Int
+            /*
+            if (flightList.length > 0){
+                flightListTail.map{  x =>  Seq(flightListHead.toInt, x.toInt)  } ++ get_pairs_of_flight(flightListTail)
+            } else List[Seq(Int, Int)]
+            */
+            flightList match{
+                case Nil => List[Seq[Int]]()
+                case flightListHead::flightListTail => {
+                    flightListTail.map{  x =>  Seq(flightListHead.toInt, x.toInt)  } ::: get_pairs_of_flight(flightListTail)
+                    //get_pairs(flightListTail, pairList)
+                    /*
+                    val wowmap = flightListTail.map{  x =>  ((flightListHead, x), 1)  }
+                    wowmap.map( x => (x._1 = x._1 +1) )
+                    (x => (, 1))
+                    println(wowmap)
+                    get_pairs(flightListTail, pairListUpdated, currentIndex + 1)
+                    */
+                }
+            }
+            /*
+            var currIndex = 0
+            var pariListVar = pairList
+            for (flyer <- flightList){
+                for (secondFlyer <- flightList.dropLeft(currIndex)){
+                    if (pariListVar.getOrElse((flyer, secondFlyer), -1) != -1){
+                        //We got it in the list
+                        pariListVar = pariListVar.get((flyer, secondFlyer)) 
+                    }else 
+                }
+                currIndex = currIndex + 1
+            }
+            */
+        }
 
 
+        def get_all_flight_pairs(flyersMap: Map[Int,List[String]], accumulator: List[Seq[Int]]): List[Seq[Int]] = { //
+            if(flyersMap.isEmpty) return accumulator
+            else return get_all_flight_pairs(flyersMap.tail, accumulator ::: get_pairs_of_flight(flyersMap.head._2))
+/*
+            get_all_flight_pairs()
+
+            for ((k,v) <- flyersMap){
+                println(get_pairs_of_flight(v))
+                //pairList = get_pairs(v, pairList, 0)
+            }
+*/
+        }
 
 
         //Q4
-        def flights_together(flyers: List[String]): Unit = {
+        def flights_together(flyers: List[String], atLeastNTimes: Int): Unit = {
+            //Get a map of FlightID => FlyerIDs
+            val flyersMap = flyers.take(5).groupBy(_.split(",")(1).toInt).map{ 
+                case (k,v) => (k, v.map {
+                    _.split(",").toList.take(1)
+                    }.flatten)
+            }
+            println(flyersMap)
+            println("--------")
+            
+            val allPairs = get_all_flight_pairs(flyersMap, List[Seq[Int]]())
+            println(allPairs)
         }
 
 
 
 
         //Q1
-        println(total_flights_month(get_all_csv(flightData)))
+        //println(total_flights_month(get_all_csv(flightData)))
         println("---")
 
         //Q2
-        println(associate_name_id(get_map(get_all_csv(passengers)), frequent_flyers(get_all_csv(flightData), 100)))
+        //println(associate_name_id(get_map(get_all_csv(passengers)), frequent_flyers(get_all_csv(flightData), 100)))
         println("---")
 
         //Q3
-        println(greatest_number_countries(get_all_csv(flightData), "uk", 3))
+        //println(greatest_number_countries(get_all_csv(flightData), "uk", 3))
         println("---")
 
 
         //Q4
-        //flights_together(get_all_csv(flightData))
+        flights_together(get_all_csv(flightData), 5)
     }
 }
 
