@@ -100,8 +100,6 @@ object quantexa {
             }
         }
 
-
-
         //Recursive function to iterate over each flyer ID
         //INPUT: A list of Strings containing (ID, List[Flights]), a "base" country to skip on and an accumulator
         //OUTPUT: a Map[Int, Int] linking flyer ID's with an amount of hops
@@ -124,90 +122,67 @@ object quantexa {
 
 
 
-
-        def get_pairs_of_flight(flightList: List[String]): List[Seq[Int]] = { //Map[(Int, Int) -> Int] , currentIndex: Int
-            /*
-            if (flightList.length > 0){
-                flightListTail.map{  x =>  Seq(flightListHead.toInt, x.toInt)  } ++ get_pairs_of_flight(flightListTail)
-            } else List[Seq(Int, Int)]
-            */
-            flightList match{
-                case Nil => List[Seq[Int]]()
-                case flightListHead::flightListTail => {
-                    flightListTail.map{  x =>  Seq(flightListHead.toInt, x.toInt)  } ::: get_pairs_of_flight(flightListTail)
-                    //get_pairs(flightListTail, pairList)
-                    /*
-                    val wowmap = flightListTail.map{  x =>  ((flightListHead, x), 1)  }
-                    wowmap.map( x => (x._1 = x._1 +1) )
-                    (x => (, 1))
-                    println(wowmap)
-                    get_pairs(flightListTail, pairListUpdated, currentIndex + 1)
-                    */
-                }
-            }
-            /*
-            var currIndex = 0
-            var pariListVar = pairList
-            for (flyer <- flightList){
-                for (secondFlyer <- flightList.dropLeft(currIndex)){
-                    if (pariListVar.getOrElse((flyer, secondFlyer), -1) != -1){
-                        //We got it in the list
-                        pariListVar = pariListVar.get((flyer, secondFlyer)) 
-                    }else 
-                }
-                currIndex = currIndex + 1
-            }
-            */
-        }
-
-
-        def get_all_flight_pairs(flyersMap: Map[Int,List[String]], accumulator: List[Seq[Int]]): List[Seq[Int]] = { //
-            if(flyersMap.isEmpty) return accumulator
-            else return get_all_flight_pairs(flyersMap.tail, accumulator ::: get_pairs_of_flight(flyersMap.head._2))
-/*
-            get_all_flight_pairs()
-
-            for ((k,v) <- flyersMap){
-                println(get_pairs_of_flight(v))
-                //pairList = get_pairs(v, pairList, 0)
-            }
-*/
-        }
-
-
-        //Q4
-        def flights_together(flyers: List[String], atLeastNTimes: Int): Unit = {
-            //Get a map of FlightID => FlyerIDs
-            val flyersMap = flyers.take(5).groupBy(_.split(",")(1).toInt).map{ 
+        //Q4 get the passengers who have been on more than N flights together.
+        //INPUT: A list of flights taken by people, atLeastNTimes, a minimum number of times two people must fly together to qualify
+        //OUTPUT: A list of Tuples(ID, ID) with the associated amount of times this pair flew together 
+        def flights_together(flights: List[String], atLeastNTimes: Int): List[((Int,Int), Int)] = {
+            //Get a map of FlightID => sorted FlyerIDs
+            val flyersMap = flights.take(50000).groupBy(_.split(",")(1).toInt).map{ 
                 case (k,v) => (k, v.map {
                     _.split(",").toList.take(1)
-                    }.flatten)
+                    }.flatten.toSeq.sortWith(_ < _).toList)
             }
-            println(flyersMap)
-            println("--------")
-            
-            val allPairs = get_all_flight_pairs(flyersMap, List[Seq[Int]]())
-            println(allPairs)
+            //Get all the instance pairs of travelers together
+            val allPairs = get_all_flight_pairs(flyersMap, List[(Int, Int)]())
+            //Count the amount of times each pair occurs
+            val countedMap = allPairs.groupBy(pair => (pair._1, pair._2)).mapValues(_.size)
+            //Filter so we have at least N flights together and sort by most to least flights a pair has done
+            countedMap.toSeq.filter(atLeastNTimes < _._2).sortWith(_._2 > _._2).toList          
         }
+
+        //Recursive function to get all the pairs of people on a flight
+        //INPUT: A List of IDs on a flight
+        //OUTPUT: A list of pairs (ID, ID) of all people on the flight
+        def get_pairs_of_flight(flightList: List[String]): List[(Int, Int)] = {
+            flightList match{
+                case Nil => List[(Int, Int)]()
+                case flightListHead::flightListTail => {
+                    flightListTail.map{  x =>  (flightListHead.toInt, x.toInt)  } ::: get_pairs_of_flight(flightListTail)
+
+                }
+            }
+        }
+
+        //Recursive function to get for each flight the pairs of people on that flight
+        //INPUT: flyersMap mapping a flight to a list of flyer ID's, an (initially empty) accumulator
+        //OUTPUT: A list of all the pairs of (ID, ID) having traveled together on all flights
+        //Duplicates of pairs if multiple travels together
+        def get_all_flight_pairs(flyersMap: Map[Int,List[String]], accumulator: List[(Int, Int)]): List[(Int, Int)] = { 
+            if(flyersMap.isEmpty) return accumulator
+            else return get_all_flight_pairs(flyersMap.tail, accumulator ::: get_pairs_of_flight(flyersMap.head._2))
+        }
+
+
+        
 
 
 
 
         //Q1
-        //println(total_flights_month(get_all_csv(flightData)))
+        println(total_flights_month(get_all_csv(flightData)))
         println("---")
 
         //Q2
-        //println(associate_name_id(get_map(get_all_csv(passengers)), frequent_flyers(get_all_csv(flightData), 100)))
+        println(associate_name_id(get_map(get_all_csv(passengers)), frequent_flyers(get_all_csv(flightData), 100)))
         println("---")
 
         //Q3
-        //println(greatest_number_countries(get_all_csv(flightData), "uk", 3))
+        println(greatest_number_countries(get_all_csv(flightData), "uk", 3))
         println("---")
 
 
         //Q4
-        flights_together(get_all_csv(flightData), 5)
+        println(flights_together(get_all_csv(flightData), 3).take(100))
     }
 }
 
