@@ -9,7 +9,7 @@ object quantexa {
         val flightData = "flightData.csv"
         val passengers = "passengers.csv"
         val dateFormat = "yyyy-MM-dd";
-        val dtf = java.time.format.DateTimeFormatter.ofPattern(dateFormat)
+        val dtf = new SimpleDateFormat(dateFormat)
 
         //Make a list from CSV file and drop first denomination line
         def get_csv(file: String) : List[String] = {
@@ -129,7 +129,7 @@ object quantexa {
         //OUTPUT: A list of Tuples(ID, ID) with the associated amount of times this pair flew together 
         def flights_together(flights: List[String], atLeastNTimes: Int): List[((Int,Int), Int)] = {
             //Get a map of FlightID => sorted FlyerIDs
-            val flyersMap = flights.take(50000).groupBy(_.split(",")(1).toInt).map{ 
+            val flyersMap = flights.groupBy(_.split(",")(1).toInt).map{ 
                 case (k,v) => (k, v.map {
                     _.split(",").toList.take(1)
                     }.flatten.toSeq.sortWith(_ < _).toList)
@@ -165,27 +165,66 @@ object quantexa {
         }
 
 
-        
 
 
 
 
-        //Q1 print output to q1 in format Month, Amount of Flights
+
+        //Challenge Q: get the passengers who have been on more than N flights together within a date range
+        //INPUT: A list of flights taken by people, atLeastNTimes, a minimum number of times two people must fly together to qualify, and from, to dates
+        //OUTPUT: A list of Tuples(ID, ID) with the associated amount of times this pair flew together 
+        def flights_together_dates(flights: List[String], atLeastNTimes: Int, from: Date, to: Date): List[((Int,Int), Int)] = {
+            val flightsWithinRange = get_flights_within_range(flights, from, to)
+            //Get a map of FlightID => sorted FlyerIDs
+            val flyersMap = flightsWithinRange.groupBy(_.split(",")(1).toInt).map{
+                case (k,v) => (k, v.map {
+                    _.split(",").toList.take(1)
+                    }.flatten.toSeq.sortWith(_ < _).toList)
+            }
+            //Get all the instance pairs of travelers together
+            val allPairs = get_all_flight_pairs(flyersMap, List[(Int, Int)]())
+            //Count the amount of times each pair occurs
+            val countedMap = allPairs.groupBy(pair => (pair._1, pair._2)).mapValues(_.size)
+            //Filter so we have at least N flights together and sort by most to least flights a pair has done
+            countedMap.toSeq.filter(atLeastNTimes < _._2).sortWith(_._2 > _._2).toList          
+        }
+
+        //INPUT: A list of flights from and to dates
+        //OUTPUT: A list of flights within the date range
+        def get_flights_within_range(flights: List[String], from: Date, to: Date): List[String] = {
+            flights.map{ x => if (!dtf.parse(x.split(",")(4)).before(from) && !dtf.parse(x.split(",")(4)).after(to)) {
+                    Some(x)
+                } else {
+                    None
+                }
+            }.flatten
+        }
+
+
+
+
+
+
+        //Q1 print output to q1 in format (Month, Amount of Flights)
         println(total_flights_month(get_csv(flightData)))
         println("---")
 
-        //Q2 print output to q2 in format number of flights, flyer ID, Name, Surname
+        //Q2 print output to q2 in format (number of flights, flyer ID, Name, Surname)
         val unformatted = associate_name_id(get_map(get_csv(passengers)), frequent_flyers(get_csv(flightData), 100))
         unformatted.values.foreach(println(_))
         println("---")
 
-        //Q3 print output to q3 in format flyer ID, number of hops
+        //Q3 print output to q3 in format (flyer ID, number of hops)
         println(greatest_number_countries(get_csv(flightData), "uk", 3))
         println("---")
 
 
-        //Q4 print output to q4 in format (flyer ID, flyer ID), Number of flights together
+        //Q4 print output to q4 in format ((flyer ID, flyer ID), Number of flights together)
         println(flights_together(get_csv(flightData), 3))
+
+        //Bonus Q print output in format ((flyer ID, flyer ID), Number of flights together)
+        //Code duplication due to the creation of two nearly identical functions, but the assignment requires it
+        println(flights_together_dates(get_csv(flightData), 3, dtf.parse("2017-01-01"), dtf.parse("2017-01-10")))
     }
 }
 
