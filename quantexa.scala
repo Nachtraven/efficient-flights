@@ -1,15 +1,18 @@
 import io.Source
 import scala.util._
-
+import java.text.SimpleDateFormat
+import java.util.Date
 
 object quantexa {
     def main(args: Array[String]) = {
 
         val flightData = "flightData.csv"
         val passengers = "passengers.csv"
+        val dateFormat = "yyyy-MM-dd";
+        val dtf = java.time.format.DateTimeFormatter.ofPattern(dateFormat)
 
         //Make a list from CSV file and drop first denomination line
-        def get_all_csv(file: String) : List[String] = {
+        def get_csv(file: String) : List[String] = {
             Source.fromFile(file).getLines.toList.drop(1)
         }
 
@@ -19,10 +22,9 @@ object quantexa {
         //Q1: Find the total number of flights for each month.
         //INPUT: a List of flights
         //OUTPUT: a Map[Month -> Number of flights]
-        //This is a method that would not work if different years were used
-        //To be able to have inter year data, one would need to parse the dates into a time format and then count them out
-        def total_flights_month(flights: List[String]) : List[(String, Int)] = {
-            flights.groupBy(_.split(",")(4).substring(5).dropRight(3)).mapValues(_.size).toSeq.sortWith(_._1 < _._1).toList
+        //This is a method that would not work if different years were used as we don't differentiate between jan 2017 and jan 2018
+        def total_flights_month(flights: List[String]) : List[(Int, Int)] = {
+            flights.groupBy(flightLine => (java.time.LocalDate.parse(flightLine.split(",")(4)).getMonthValue)).mapValues(_.size).toSeq.sortWith(_._1 < _._1).toList
         }
 
 
@@ -169,21 +171,21 @@ object quantexa {
 
 
         //Q1 print output to q1 in format Month, Amount of Flights
-        println(total_flights_month(get_all_csv(flightData)))
+        println(total_flights_month(get_csv(flightData)))
         println("---")
 
         //Q2 print output to q2 in format number of flights, flyer ID, Name, Surname
-        val unformatted = associate_name_id(get_map(get_all_csv(passengers)), frequent_flyers(get_all_csv(flightData), 100))
-        println(unformatted.values)
+        val unformatted = associate_name_id(get_map(get_csv(passengers)), frequent_flyers(get_csv(flightData), 100))
+        unformatted.values.foreach(println(_))
         println("---")
 
         //Q3 print output to q3 in format flyer ID, number of hops
-        println(greatest_number_countries(get_all_csv(flightData), "uk", 3))
+        println(greatest_number_countries(get_csv(flightData), "uk", 3))
         println("---")
 
 
         //Q4 print output to q4 in format (flyer ID, flyer ID), Number of flights together
-        println(flights_together(get_all_csv(flightData), 3))
+        println(flights_together(get_csv(flightData), 3))
     }
 }
 
