@@ -8,9 +8,9 @@ Total coding + Learning time: 25 hours
 
 ### Navigate to folder containing files
 
-### Compile with scalac *.scala
+### Compile with "scalac *.scala"
 
-### Run with scala -J-Xmx2g -J-Xss1024m quantexa
+### Run with "scala -J-Xmx2g -J-Xss1024m quantexa"
 
 Output is in 4 parts: 1, 2, 3, 4/bonus (Q4 and Bonus are nearly idential, Q4 not included as it causes a memory overflow due to the amount to print)
 Each question class outputs its own result
