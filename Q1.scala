@@ -1,9 +1,6 @@
 package question
 
-import io.Source
 import scala.util._
-import java.text.SimpleDateFormat
-import java.util.Date
 import java.time.LocalDate
 
 
@@ -30,5 +27,6 @@ class Q1 (val flightList: List[String]) {
 
     //Output result
     val output = order_list_by_key(total_flights_month(flightList))
+    println("Q1")
     println(output)
 }

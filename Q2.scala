@@ -1,6 +1,5 @@
 package question
 
-import io.Source
 import scala.util._
 
 
@@ -34,5 +33,7 @@ class Q2 (val flightList: List[String], val passengerList: List[String]) {
 
     //Output result
     val unformatted = associate_name_id(get_map(passengerList), frequent_flyers(flightList, 100))
-    unformatted.values.foreach(println(_))
+    println("Q2")
+    //Format result by descending amount of flights taken and print each line individually
+    unformatted.values.toList.toSeq.sortWith(_(0) > _(0)).foreach(println(_))
 }
