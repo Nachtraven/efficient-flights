@@ -1,5 +1,5 @@
-# Quantexa
-Coding challenge for quantexa
+# Efficient flights
+Coding challenge for a redacted employer
 
 Total coding + Learning time: 25 hours
 
